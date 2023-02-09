@@ -1,0 +1,22 @@
+Music Metrics Color Palette
+
+Main
+#3de2ff
+
+Main+
+#4cffff (125%, capped)
+
+Main-
+#2eaabf (75%)
+
+Dark
+#1a1e1f
+
+Light
+#cce2e6
+
+Success (Spotify Green)
+#1db954
+
+Error (Semi-inverse of Spotify Green)
+#e24646
