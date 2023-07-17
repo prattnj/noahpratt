@@ -1,0 +1,19 @@
+body {
+    margin: 0;
+    height: 100vh;
+}
+
+canvas {
+    width: 100vw !important;
+    height: 100vh !important;
+    display: block;
+}
+
+.welcome {
+    position: absolute;
+    bottom: 10%;
+    width: 100%;
+    color: white;
+    font-size: 5rem;
+    text-align: center;
+}
