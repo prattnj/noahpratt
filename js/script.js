@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import {getCustomPentagonalPrism} from "./shapes"
 
-// SET UP RENDERER
+// SET UP RENDERER todo remove this
 const renderer = new THREE.WebGLRenderer();
 renderer.shadowMap.enabled = true
 renderer.setClearColor(0x1a1e1f)
