@@ -2,8 +2,17 @@ import * as THREE from "three";
 import {polarToCartesian} from "./util";
 import {FontLoader} from "three/examples/jsm/loaders/FontLoader";
 import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
+import fourpeaks from '../assets/4peaks.jpg'
+import mm from '../assets/mm.png'
+import ghp from '../assets/ghp.png'
 
-export function getCustomPentagonalPrism(height, radius) {
+export const clickables = []
+const fontLoader = new FontLoader()
+const textureLoader = new THREE.TextureLoader()
+const prismHeight = 1
+
+export function getCustomPentagonalPrism(radius, instance) {
+    if (instance !== 'l' && instance !== 'm' && instance !== 'r') return
 
     const SMALL_R = radius * Math.cos(Math.PI / 5)
     const SIDE = 2 * radius * Math.sin(Math.PI / 5)
@@ -12,36 +21,44 @@ export function getCustomPentagonalPrism(height, radius) {
     const bottom = new THREE.Mesh(new THREE.CircleGeometry(radius, 5), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
     const top = new THREE.Mesh(new THREE.CircleGeometry(radius, 5), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
 
-    // Create 5 rectangles
-    const sides = []
-    for (let i = 0; i < 5; i ++) {
-        const side = new THREE.Mesh(new THREE.PlaneGeometry(SIDE, height), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
+    // Add titles to top pentagon
+    if (instance === 'l' || instance === 'r') {
         const loader = new FontLoader();
-
         loader.load('fonts/noto-sans-regular.json', function (font) {
 
-            const geometry = new TextGeometry( 'Noah Pratt', {
+            const message = instance === 'l' ? "PROJECTS" : "SOCIAL"
+            const geometry = new TextGeometry( message, {
                 font: font,
-                size: .1,
+                size: .22,
                 height: .01,
             } );
             geometry.computeBoundingBox()
             const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x
 
-            const text = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
+            const text = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x000000, side: THREE.DoubleSide}))
 
-            text.position.set(textWidth / -2, .3 * height, 0)
+            text.position.set(-.05, textWidth / 2, 0)
+            text.rotation.z += Math.PI / -2
 
-            side.add(text)
+            top.add(text)
         } );
-        sides.push(side)
     }
 
+    // Create 5 rectangles
+    const sides = []
+    for (let i = 0; i < 5; i ++) {
+        const side = new THREE.Mesh(new THREE.PlaneGeometry(SIDE, prismHeight), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
+        sides.push(side)
+    }
+    if (instance === 'l') getLeftSides(sides);
+    else if (instance === 'm') getMiddleSides(sides);
+    else if (instance === 'r') getRightSides(sides);
+
     // Position the pentagons
-    bottom.position.set(0, (-height / 2), 0)
-    top.position.set(0, (height / 2), 0)
+    bottom.position.set(0, (-prismHeight / 2), 0)
+    top.position.set(0, (prismHeight / 2), 0)
     bottom.rotation.x = Math.PI / 2
-    top.rotation.x = Math.PI / 2
+    top.rotation.x = Math.PI / -2
 
     // Position the rectangles
     for (let i = 0; i < 5; i ++) {
@@ -58,114 +75,129 @@ export function getCustomPentagonalPrism(height, radius) {
     return group
 }
 
-export function getCustomDodecahedron() {
+function getLeftSides(sides) {
 
-    const PHI = (1 + Math.sqrt(5)) / 2
+    // ADD ALL TEXT
+    fontLoader.load('fonts/noto-sans-regular.json', function (font) {
+        // SIDE 0
+        sides[0].add(getTopText('Family Map', font))
 
-    // Pentagon
-    const P_BIG_R = 1
-    const P_SMALL_R = P_BIG_R * Math.cos(Math.PI / 5)
-    const P_SIDE = 2 * P_BIG_R * Math.sin(Math.PI / 5)
-    const P_HEIGHT = P_SMALL_R + P_BIG_R;
+        // SIDE 1
+        sides[1].add(getTopText('GoatHouse Pizza', font))
+        sides[1].add(getBottomText('Online hub for my pizza company', font))
 
-    // Angles
-    const DD_DIHEDRAL_ANGLE = 2 * Math.atan(PHI)        // Angle between faces in radians
-    const DD_EXTERNAL_ANGLE = Math.PI - DD_DIHEDRAL_ANGLE
+        // SIDE 2
+        sides[2].add(getTopText('Music Metrics', font))
+        sides[2].add(getBottomText('Full stack music statistics software', font))
 
-    // Dodecahedron
-    const H1 = P_HEIGHT * Math.sin(DD_EXTERNAL_ANGLE)   // Vertical distance between an upper side vertex and the ground
-    const H2 = P_SIDE * Math.sin(DD_EXTERNAL_ANGLE)     // Vertical distance between a lower side vertex and the ground
-    const DODECAHEDRON_HEIGHT = H1 + H2
-    const Y_POS1 = P_SMALL_R * Math.sin(DD_EXTERNAL_ANGLE)
-    const Y_POS2 = DODECAHEDRON_HEIGHT - Y_POS1
+        // SIDE 3
+        sides[3].add(getTopText('Chess', font))
 
-    // Radial (lateral) distance from the center of a side pentagon to the center of the dodecahedron's base
-    const RADIAL_DISTANCE = (P_SMALL_R / 2) * Math.cos(DD_EXTERNAL_ANGLE) + P_SMALL_R
+        // SIDE 4
+        sides[4].add(getTopText('<add project>', font))
+    });
 
-    // Create 12 pentagons
-    const pentagons = []
-    for (let i = 0; i < 12; i ++) {
-        const pentagon = new THREE.Mesh(new THREE.CircleGeometry(1, 5), new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff, side: THREE.DoubleSide}))
-        pentagons.push(pentagon)
-    }
+    // ADD IMAGES
+    sides[1].add(getPictureFrame(1, .6, ghp, "https://goathousepizza.com"))
+    sides[2].add(getPictureFrame(1, .6, mm, "https://musicmetrics.app"))
+}
 
-    // POSITION --------------------------------------------------------------------------------------------------------
+function getMiddleSides(sides) {
 
-    // Bottom and top
-    pentagons[0].position.set(0, 0, 0)
-    pentagons[1].position.set(0, DODECAHEDRON_HEIGHT, 0)
+    // ADD ALL TEXT
+    fontLoader.load('fonts/noto-sans-regular.json', function (font) {
+        // SIDE 0
+        sides[0].add(getTopText('Work Experience', font))
 
-    // Lower pentagons
-    const lower1 = polarToCartesian(RADIAL_DISTANCE, Math.PI / 5)
-    const lower2 = polarToCartesian(RADIAL_DISTANCE, 3 * Math.PI / 5)
-    const lower3 = polarToCartesian(RADIAL_DISTANCE, 5 * Math.PI / 5)
-    const lower4 = polarToCartesian(RADIAL_DISTANCE, 7 * Math.PI / 5)
-    const lower5 = polarToCartesian(RADIAL_DISTANCE, 9 * Math.PI / 5)
-    pentagons[2].position.set(lower1[0], Y_POS1, lower1[1])
-    pentagons[3].position.set(lower2[0], Y_POS1, lower2[1])
-    pentagons[4].position.set(lower3[0], Y_POS1, lower3[1])
-    pentagons[5].position.set(lower4[0], Y_POS1, lower4[1])
-    pentagons[6].position.set(lower5[0], Y_POS1, lower5[1])
+        // SIDE 1
+        sides[1].add(getTopText('Education', font))
 
-    // Upper pentagons
-    const upper1 = polarToCartesian(RADIAL_DISTANCE, 0)
-    const upper2 = polarToCartesian(RADIAL_DISTANCE, 2 * Math.PI / 5)
-    const upper3 = polarToCartesian(RADIAL_DISTANCE, 4 * Math.PI / 5)
-    const upper4 = polarToCartesian(RADIAL_DISTANCE, 6 * Math.PI / 5)
-    const upper5 = polarToCartesian(RADIAL_DISTANCE, 8 * Math.PI / 5)
-    pentagons[7].position.set(upper1[0], Y_POS2, upper1[1])
-    pentagons[8].position.set(upper2[0], Y_POS2, upper2[1])
-    pentagons[9].position.set(upper3[0], Y_POS2, upper3[1])
-    pentagons[10].position.set(upper4[0], Y_POS2, upper4[1])
-    pentagons[11].position.set(upper5[0], Y_POS2, upper5[1])
+        // SIDE 2
+        sides[2].add(getTopText('Pic of me', font))
 
-    // TILT ------------------------------------------------------------------------------------------------------------
+        // SIDE 3
+        sides[3].add(getTopText('Welcome', font))
 
-    // ROTATION --------------------------------------------------------------------------------------------------------
+        // SIDE 4
+        sides[4].add(getTopText('Hobbies', font))
+    });
 
+    // ADD IMAGES
+    sides[3].add(getPictureFrame(1, .5, fourpeaks, null))
+}
 
-    //pentagons[2].rotation.x += DD_DIHEDRAL_ANGLE - (Math.PI / 2)
-    //pentagons[2].rotation.y = 3 * Math.PI / 10
-    //pentagons[2].rotation.z = Math.PI
+function getRightSides(sides) {
 
-    //pentagons[4].rotation.x = Math.PI / 2
-    //pentagons[4].rotation.y = DD_DIHEDRAL_ANGLE
-    //pentagons[4].rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2)
+    // ADD ALL TEXT
+    fontLoader.load('fonts/noto-sans-regular.json', function (font) {
+        // SIDE 0
+        sides[0].add(getTopText('Spotify', font))
 
-    // Bottom and top
-    pentagons[0].rotation.x = Math.PI / 2
-    pentagons[1].rotation.x = Math.PI / 2
-    pentagons[1].rotation.y = Math.PI
+        // SIDE 1
+        sides[1].add(getTopText('Instagram', font))
 
-    // Lower pentagons
-    pentagons[2].rotation.z = Math.PI / 10
-    pentagons[3].rotation.z = Math.PI / 10
-    pentagons[4].rotation.z = Math.PI / 10
-    pentagons[5].rotation.z = Math.PI / 10
-    pentagons[6].rotation.z = Math.PI / 10
+        // SIDE 2
+        sides[2].add(getTopText('Gmail', font))
 
-    pentagons[2].rotation.y = 13 * Math.PI / 10
-    pentagons[3].rotation.y = 9 * Math.PI / 10
-    pentagons[4].rotation.y = 5 * Math.PI / 10
-    pentagons[5].rotation.y = Math.PI / 10
-    pentagons[6].rotation.y = -3 * Math.PI / 10
+        // SIDE 3
+        sides[3].add(getTopText('Github', font))
 
-    //pentagons[4].rotation.x = Math.PI / 2
+        // SIDE 4
+        sides[4].add(getTopText('LinkedIn', font))
+    });
 
-    // Upper pentagons
-    pentagons[7].rotation.z = -1 * Math.PI / 10
-    pentagons[8].rotation.z = -1 * Math.PI / 10
-    pentagons[9].rotation.z = -1 * Math.PI / 10
-    pentagons[10].rotation.z = -1 * Math.PI / 10
-    pentagons[11].rotation.z = -1 * Math.PI / 10
+    // ADD IMAGES
+}
 
-    pentagons[7].rotation.y = 5 * Math.PI / 10
-    pentagons[8].rotation.y = Math.PI / 10
-    pentagons[9].rotation.y = -3 * Math.PI / 10
-    pentagons[10].rotation.y = -7 * Math.PI / 10
-    pentagons[11].rotation.y = -11 * Math.PI / 10
+function centerTextX(geometry) {
+    geometry.computeBoundingBox()
+    const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x
+    return textWidth / -2
+}
 
-    const group = new THREE.Group()
-    for (let i = 0; i < 12; i ++) group.add(pentagons[i])
-    return group
+function getTopText(text, font, options) {
+    if (options === undefined) options = {}
+    const geometry = new TextGeometry(text, {
+        font: font,
+        size: options.size || .1,
+        height: options.thickness || .01,
+    } );
+    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
+    words.position.set(centerTextX(geometry), .35 * (options.height || 1), 0)
+    return words
+}
+
+function getBottomText(text, font, options) {
+    if (options === undefined) options = {}
+    const geometry = new TextGeometry(text, {
+        font: font,
+        size: options.size || .05,
+        height: options.thickness || .005,
+    } );
+    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
+    words.position.set(centerTextX(geometry), -.42 * (options.height || 1), 0)
+    return words
+}
+
+function getPictureFrame(x, y, res, url) {
+    const geometry = new THREE.BoxGeometry(x, y, .05)
+    const materials = [
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xcccccc, map: textureLoader.load(res)}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa})
+    ]
+    const materials2 = [
+        new THREE.MeshBasicMaterial({color: 0xeeeeee}),
+        new THREE.MeshBasicMaterial({color: 0xeeeeee}),
+        new THREE.MeshBasicMaterial({color: 0xeeeeee}),
+        new THREE.MeshBasicMaterial({color: 0xeeeeee}),
+        new THREE.MeshBasicMaterial({color: 0xffffff, map: textureLoader.load(res)}),
+        new THREE.MeshBasicMaterial({color: 0xeeeeee})
+    ]
+    const mesh = new THREE.Mesh(geometry, materials)
+    clickables.push([mesh, materials, materials2, url])
+    return mesh
 }

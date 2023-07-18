@@ -1,5 +1,7 @@
 import * as THREE from 'three'
-import {getCustomPentagonalPrism} from "./shapes"
+import {clickables, getCustomPentagonalPrism} from "./shapes"
+import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
+import {BoxGeometry} from "three";
 
 // SET UP RENDERER
 const renderer = new THREE.WebGLRenderer();
@@ -30,15 +32,18 @@ const scene = new THREE.Scene()
 scene.add(dLight)
 scene.add(aLight)
 
-const polyhedron = getCustomPentagonalPrism(1, 1.2)
+// ADD POLYHEDRONS
+const polyhedron = getCustomPentagonalPrism(1.2, 'm')
 polyhedron.position.set(0, 1, 0)
 scene.add(polyhedron)
-const leftPolyhedron = getCustomPentagonalPrism(1, 1)
+const leftPolyhedron = getCustomPentagonalPrism(1, 'l')
 leftPolyhedron.position.set(0, 0, -3)
 scene.add(leftPolyhedron)
-const rightPolyhedron = getCustomPentagonalPrism(1, 1)
+const rightPolyhedron = getCustomPentagonalPrism(1, 'r')
 rightPolyhedron.position.set(0, 0, 3)
 scene.add(rightPolyhedron)
+
+let lastClickable = null
 
 // SET UP OBJECT'S SPIN
 let mouseDown = false
@@ -59,7 +64,7 @@ renderer.setAnimationLoop(() => {
     renderer.render(scene, camera);
 });
 
-// SET UP MOUSE EVENTS
+// SET UP MOUSE EVENTS AND ROTATION
 function addMouseHandler(canvas) {
     canvas.addEventListener('mousemove', function(e) {
         onMouseMove(e)
@@ -76,16 +81,34 @@ function addMouseHandler(canvas) {
 }
 
 function onMouseMove(event) {
-    if (!mouseDown) return
     event.preventDefault()
 
-    let deltaX = event.clientX - mouseX
-    if (clickedObject === leftPolyhedron) deltaXleft = deltaX;
-    else if (clickedObject === polyhedron) deltaXmiddle = deltaX;
-    else if (clickedObject === rightPolyhedron) deltaXright = deltaX;
+    // Rotation logic
+    if (mouseDown) {
+        let deltaX = event.clientX - mouseX
+        if (clickedObject === leftPolyhedron) deltaXleft = deltaX;
+        else if (clickedObject === polyhedron) deltaXmiddle = deltaX;
+        else if (clickedObject === rightPolyhedron) deltaXright = deltaX;
 
-    rotateObject(clickedObject, deltaX)
-    mouseX = event.clientX
+        rotateObject(clickedObject, deltaX)
+        mouseX = event.clientX
+        return
+    }
+
+    // Cursor logic
+    const intersects = setUpRayCaster(event)
+    if (intersects.length > 0) {
+        const clicked = intersects[0].object
+        const index = clickablesContains(clicked)
+        if (index >= 0) {
+            clicked.material = clickables[index][2]
+            lastClickable = clicked
+            document.body.style.cursor = "pointer"
+        } else {
+            if (lastClickable !== null) lastClickable.material = clickables[clickablesContains(lastClickable)][1]
+            document.body.style.cursor = "auto"
+        }
+    }
 }
 
 function onMouseDown(event) {
@@ -93,14 +116,16 @@ function onMouseDown(event) {
     mouseDown = true;
     mouseX = event.clientX;
 
-    const rayCaster = new THREE.Raycaster(undefined, undefined, 0, undefined)
-    const mouse = new THREE.Vector2()
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
-    rayCaster.setFromCamera(mouse, camera)
-    const intersects = rayCaster.intersectObjects(scene.children)
+    const intersects = setUpRayCaster(event)
     if (intersects.length > 0) {
-        clickedObject = intersects[0].object.parent
+        const clicked = intersects[0].object
+        const index = clickablesContains(clicked)
+        if (index >= 0 && clickables[index][3] !== null) {
+            window.open(clickables[index][3])
+            lastClickable.material = clickables[index][1]
+        }
+        if (clicked.geometry instanceof TextGeometry || clicked.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent
+        else clickedObject = clicked.parent
     }
 }
 
@@ -124,4 +149,18 @@ function updateDeltas() {
 
     if (Math.abs(deltaXright) > Math.abs(baseSpin)) deltaXright *= .985
     else if (Math.abs(deltaXright) === 0) deltaXright = baseSpin;
+}
+
+function clickablesContains(object) {
+    for (let i = 0; i < clickables.length; i++) if (clickables[i][0] === object) return i;
+    return -1
+}
+
+function setUpRayCaster(event) {
+    const rayCaster = new THREE.Raycaster(undefined, undefined, 0, undefined)
+    const mouse = new THREE.Vector2()
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1
+    rayCaster.setFromCamera(mouse, camera)
+    return rayCaster.intersectObjects(scene.children)
 }
