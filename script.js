@@ -40,7 +40,7 @@ scene.add(aLight)
 // CREATE GLOBAL VARIABLES
 let clickedObject = null
 let lastClickable = null
-export const clickables = []
+const clickables = []
 
 // SET UP LOADERS
 const loadingManager = new THREE.LoadingManager()
