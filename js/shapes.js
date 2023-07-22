@@ -74,7 +74,7 @@ function getLeftSides(sides) {
     });
 
     // ADD IMAGES
-    sides[3].add(getProjectPicture(1, .5, fourpeaks, null))
+    //sides[3].add(getProjectPicture(1, .5, fourpeaks, null))
 }
 
 function getRightSides(sides) {
