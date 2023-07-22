@@ -55,7 +55,8 @@ rightPolyhedron.position.set(0, 1, 1.2)
 
 // CREATE LOADING BEHAVIOR
 loadingManager.onLoad = function() {
-    document.body.removeChild(document.getElementById('loading'))
+    const loadingHTML = document.getElementById('loading')
+    if (loadingHTML !== undefined && loadingHTML !== null) document.body.removeChild(loadingHTML)
     scene.add(leftPolyhedron)
     scene.add(rightPolyhedron)
 }
