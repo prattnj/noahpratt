@@ -11,7 +11,7 @@ canvas {
 
 .welcome {
     position: absolute;
-    bottom: 10%;
+    bottom: 0;
     width: 100%;
     color: white;
     font-size: 5rem;

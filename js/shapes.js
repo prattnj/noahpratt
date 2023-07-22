@@ -1,10 +1,12 @@
 import * as THREE from "three";
-import {polarToCartesian} from "./util";
 import {FontLoader} from "three/examples/jsm/loaders/FontLoader";
 import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
 import fourpeaks from '../assets/4peaks.jpg'
-import mm from '../assets/mm.png'
+import fms from '../assets/fms.png'
 import ghp from '../assets/ghp.png'
+import mm from '../assets/mm.png'
+import chess from '../assets/chess.png'
+import wood from '../assets/wood.png'
 
 export const clickables = []
 const fontLoader = new FontLoader()
@@ -12,7 +14,7 @@ const textureLoader = new THREE.TextureLoader()
 const prismHeight = 1
 
 export function getCustomPentagonalPrism(radius, instance) {
-    if (instance !== 'l' && instance !== 'm' && instance !== 'r') return
+    if (instance !== 'l' && instance !== 'r') return
 
     const SMALL_R = radius * Math.cos(Math.PI / 5)
     const SIDE = 2 * radius * Math.sin(Math.PI / 5)
@@ -21,29 +23,6 @@ export function getCustomPentagonalPrism(radius, instance) {
     const bottom = new THREE.Mesh(new THREE.CircleGeometry(radius, 5), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
     const top = new THREE.Mesh(new THREE.CircleGeometry(radius, 5), new THREE.MeshStandardMaterial({color: 0x3de2ff, side: THREE.DoubleSide}))
 
-    // Add titles to top pentagon
-    if (instance === 'l' || instance === 'r') {
-        const loader = new FontLoader();
-        loader.load('fonts/noto-sans-regular.json', function (font) {
-
-            const message = instance === 'l' ? "PROJECTS" : "SOCIAL"
-            const geometry = new TextGeometry( message, {
-                font: font,
-                size: .22,
-                height: .01,
-            } );
-            geometry.computeBoundingBox()
-            const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x
-
-            const text = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x000000, side: THREE.DoubleSide}))
-
-            text.position.set(-.05, textWidth / 2, 0)
-            text.rotation.z += Math.PI / -2
-
-            top.add(text)
-        } );
-    }
-
     // Create 5 rectangles
     const sides = []
     for (let i = 0; i < 5; i ++) {
@@ -51,7 +30,6 @@ export function getCustomPentagonalPrism(radius, instance) {
         sides.push(side)
     }
     if (instance === 'l') getLeftSides(sides);
-    else if (instance === 'm') getMiddleSides(sides);
     else if (instance === 'r') getRightSides(sides);
 
     // Position the pentagons
@@ -80,33 +58,6 @@ function getLeftSides(sides) {
     // ADD ALL TEXT
     fontLoader.load('fonts/noto-sans-regular.json', function (font) {
         // SIDE 0
-        sides[0].add(getTopText('Family Map', font))
-
-        // SIDE 1
-        sides[1].add(getTopText('GoatHouse Pizza', font))
-        sides[1].add(getBottomText('Online hub for my pizza company', font))
-
-        // SIDE 2
-        sides[2].add(getTopText('Music Metrics', font))
-        sides[2].add(getBottomText('Full stack music statistics software', font))
-
-        // SIDE 3
-        sides[3].add(getTopText('Chess', font))
-
-        // SIDE 4
-        sides[4].add(getTopText('<add project>', font))
-    });
-
-    // ADD IMAGES
-    sides[1].add(getPictureFrame(1, .6, ghp, "https://goathousepizza.com"))
-    sides[2].add(getPictureFrame(1, .6, mm, "https://musicmetrics.app"))
-}
-
-function getMiddleSides(sides) {
-
-    // ADD ALL TEXT
-    fontLoader.load('fonts/noto-sans-regular.json', function (font) {
-        // SIDE 0
         sides[0].add(getTopText('Work Experience', font))
 
         // SIDE 1
@@ -116,14 +67,14 @@ function getMiddleSides(sides) {
         sides[2].add(getTopText('Pic of me', font))
 
         // SIDE 3
-        sides[3].add(getTopText('Welcome', font))
+        sides[3].add(getTopText('Socials', font))
 
         // SIDE 4
         sides[4].add(getTopText('Hobbies', font))
     });
 
     // ADD IMAGES
-    sides[3].add(getPictureFrame(1, .5, fourpeaks, null))
+    sides[3].add(getProjectPicture(1, .5, fourpeaks, null))
 }
 
 function getRightSides(sides) {
@@ -131,28 +82,49 @@ function getRightSides(sides) {
     // ADD ALL TEXT
     fontLoader.load('fonts/noto-sans-regular.json', function (font) {
         // SIDE 0
-        sides[0].add(getTopText('Spotify', font))
+        sides[0].add(getBillboard('50 High Points', font))
+        sides[0].add(getBottomText('Coming soon...', font, {yPos: .0000001}))
 
         // SIDE 1
-        sides[1].add(getTopText('Instagram', font))
+        sides[1].add(getBillboard('Online Chess', font))
+        sides[1].add(getBottomText('Fully functional chess server', font, {yPos: -.25}))
+        sides[1].add(getBottomText('written in Java. For now, the client', font, {yPos: -.35}))
+        sides[1].add(getBottomText('is available as an executable .jar.', font, {yPos: -.45}))
 
         // SIDE 2
-        sides[2].add(getTopText('Gmail', font))
+        sides[2].add(getBillboard('Family Map', font))
+        sides[2].add(getBottomText('Artificial family history data', font, {yPos: -.25}))
+        sides[2].add(getBottomText('generation in both Java and Go.', font, {yPos: -.35}))
+        sides[2].add(getBottomText('Client is a native Android app.', font, {yPos: -.45}))
 
         // SIDE 3
-        sides[3].add(getTopText('Github', font))
+        sides[3].add(getBillboard('Music Metrics', font))
+        sides[3].add(getBottomText('Full stack app to see stats about', font, {yPos: -.25}))
+        sides[3].add(getBottomText('your all-time Spotify listening', font, {yPos: -.35}))
+        sides[3].add(getBottomText('history. Written in Go and React.', font, {yPos: -.45}))
 
         // SIDE 4
-        sides[4].add(getTopText('LinkedIn', font))
+        sides[4].add(getBillboard('GoatHouse Pizza', font))
+        sides[4].add(getBottomText('Online hub for my pizza company.', font, {yPos: -.25}))
+        sides[4].add(getBottomText('Front end written in Vanilla JS', font, {yPos: -.35}))
+        sides[4].add(getBottomText('and utilizes Microsoft Azure.', font, {yPos: -.45}))
     });
 
     // ADD IMAGES
-}
 
-function centerTextX(geometry) {
-    geometry.computeBoundingBox()
-    const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x
-    return textWidth / -2
+    // SIDE 0
+
+    // SIDE 1
+    sides[1].add(getProjectPicture(chess, "https://cs240.noahpratt.com"))
+
+    // SIDE 2
+    sides[2].add(getProjectPicture(fms, "https://fms.noahpratt.com"))
+
+    // SIDE 3
+    sides[3].add(getProjectPicture(mm, "https://musicmetrics.app"))
+
+    // SIDE 4
+    sides[4].add(getProjectPicture(ghp, "https://goathousepizza.com"))
 }
 
 function getTopText(text, font, options) {
@@ -173,14 +145,15 @@ function getBottomText(text, font, options) {
         font: font,
         size: options.size || .05,
         height: options.thickness || .005,
-    } );
+        alignment: 'center'
+    });
     const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
-    words.position.set(centerTextX(geometry), -.42 * (options.height || 1), 0)
+    words.position.set(centerTextX(geometry), (options.yPos || -.42), 0)
     return words
 }
 
-function getPictureFrame(x, y, res, url) {
-    const geometry = new THREE.BoxGeometry(x, y, .05)
+function getProjectPicture(res, url) {
+    const geometry = new THREE.BoxGeometry(1, .6, .05)
     const materials = [
         new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
         new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
@@ -198,6 +171,65 @@ function getPictureFrame(x, y, res, url) {
         new THREE.MeshBasicMaterial({color: 0xeeeeee})
     ]
     const mesh = new THREE.Mesh(geometry, materials)
+    mesh.position.y = .15
     clickables.push([mesh, materials, materials2, url])
     return mesh
+}
+
+function getBillboard(text, font) {
+
+    const FONT_SIZE = .08
+    const HORIZ_PADDING = .1
+    const VERT_PADDING = .1
+    const HEIGHT = FONT_SIZE + VERT_PADDING;
+
+    const geometry = new TextGeometry(text, {
+        font: font,
+        size: FONT_SIZE,
+        height: .01,
+    });
+    const textWidth = centerTextX(geometry) * -2
+
+    // Create base
+    const boardGeo = new THREE.BoxGeometry(textWidth + HORIZ_PADDING, HEIGHT, .01)
+    const boardMats = [
+        new THREE.MeshStandardMaterial({color: 0x998250}),
+        new THREE.MeshStandardMaterial({color: 0x998250}),
+        new THREE.MeshStandardMaterial({color: 0x998250}),
+        new THREE.MeshStandardMaterial({color: 0x998250}),
+        new THREE.MeshStandardMaterial({color: 0xaa9960, map: textureLoader.load(wood)}),
+        new THREE.MeshStandardMaterial({color: 0xffffff, map: textureLoader.load(wood)})
+    ]
+    const board = new THREE.Mesh(boardGeo, boardMats)
+
+    // Add text
+    const textMesh = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0xdddddd}))
+    textMesh.position.set(textWidth / -2, FONT_SIZE / -2, 0)
+    board.add(textMesh)
+
+    // Add posts
+    const postGeo = new THREE.BoxGeometry(.02, .3, .02)
+    const postMat = new THREE.MeshStandardMaterial({color: 0x553333})
+    const post1 = new THREE.Mesh(postGeo, postMat)
+    const post2 = new THREE.Mesh(postGeo, postMat)
+    post1.position.set(textWidth / -2, -.04, -.01)
+    post2.position.set(textWidth / 2, -.04, -.01)
+    board.add(post1)
+    board.add(post2)
+
+    board.position.set(0, .61, -.05)
+
+    return board
+}
+
+function centerTextX(geometry) {
+    geometry.computeBoundingBox()
+    const textWidth = geometry.boundingBox.max.x - geometry.boundingBox.min.x
+    return textWidth / -2
+}
+
+function polarToCartesian(radius, theta) {
+    const x = radius * Math.cos(theta);
+    const y = radius * Math.sin(theta);
+    return [x, y];
 }

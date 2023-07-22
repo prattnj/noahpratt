@@ -12,8 +12,8 @@ document.body.appendChild(renderer.domElement);
 
 // SET UP CAMERA
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-3, 1.7, 0)
-camera.lookAt(0, 0, 0)
+camera.position.set(-2, 1.6, 0)
+camera.lookAt(0, .5, 0)
 
 // SET UP RESIZE LISTENER
 window.addEventListener('resize', function(){
@@ -33,14 +33,11 @@ scene.add(dLight)
 scene.add(aLight)
 
 // ADD POLYHEDRONS
-const polyhedron = getCustomPentagonalPrism(1.2, 'm')
-polyhedron.position.set(0, 1, 0)
-scene.add(polyhedron)
 const leftPolyhedron = getCustomPentagonalPrism(1, 'l')
-leftPolyhedron.position.set(0, 0, -3)
+leftPolyhedron.position.set(0, 1, -1.2)
 scene.add(leftPolyhedron)
 const rightPolyhedron = getCustomPentagonalPrism(1, 'r')
-rightPolyhedron.position.set(0, 0, 3)
+rightPolyhedron.position.set(0, 1, 1.2)
 scene.add(rightPolyhedron)
 
 let lastClickable = null
@@ -50,7 +47,6 @@ let mouseDown = false
 let mouseX = 0
 const baseSpin = -0.4;
 let deltaXleft = baseSpin
-let deltaXmiddle = baseSpin
 let deltaXright = baseSpin
 let clickedObject = null
 addMouseHandler(document.body)
@@ -59,7 +55,6 @@ addMouseHandler(document.body)
 renderer.setAnimationLoop(() => {
     if (!mouseDown) updateDeltas()
     if (clickedObject !== leftPolyhedron) rotateObject(leftPolyhedron, deltaXleft)
-    if (clickedObject !== polyhedron) rotateObject(polyhedron, deltaXmiddle)
     if (clickedObject !== rightPolyhedron) rotateObject(rightPolyhedron, deltaXright)
     renderer.render(scene, camera);
 });
@@ -87,7 +82,6 @@ function onMouseMove(event) {
     if (mouseDown) {
         let deltaX = event.clientX - mouseX
         if (clickedObject === leftPolyhedron) deltaXleft = deltaX;
-        else if (clickedObject === polyhedron) deltaXmiddle = deltaX;
         else if (clickedObject === rightPolyhedron) deltaXright = deltaX;
 
         rotateObject(clickedObject, deltaX)
@@ -108,6 +102,12 @@ function onMouseMove(event) {
             if (lastClickable !== null) lastClickable.material = clickables[clickablesContains(lastClickable)][1]
             document.body.style.cursor = "auto"
         }
+    } else {
+        // deselect all picture frames
+        document.body.style.cursor = "auto"
+        clickables.forEach(item => {
+            item[0].material = item[1]
+        })
     }
 }
 
@@ -124,7 +124,13 @@ function onMouseDown(event) {
             window.open(clickables[index][3])
             lastClickable.material = clickables[index][1]
         }
-        if (clicked.geometry instanceof TextGeometry || clicked.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent
+        if (clicked.geometry instanceof TextGeometry) {
+            if (clicked.parent.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent.parent
+            else clickedObject = clicked.parent.parent
+        } else if (clicked.geometry instanceof BoxGeometry) {
+            if (clicked.parent.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent.parent
+            else clickedObject = clicked.parent.parent
+        }
         else clickedObject = clicked.parent
     }
 }
@@ -143,9 +149,6 @@ function rotateObject(object, deltaX) {
 function updateDeltas() {
     if (Math.abs(deltaXleft) > Math.abs(baseSpin)) deltaXleft *= .98
     else if (Math.abs(deltaXleft) === 0) deltaXleft = baseSpin;
-
-    if (Math.abs(deltaXmiddle) > Math.abs(baseSpin)) deltaXmiddle *= .98
-    else if (Math.abs(deltaXmiddle) === 0) deltaXmiddle = baseSpin;
 
     if (Math.abs(deltaXright) > Math.abs(baseSpin)) deltaXright *= .985
     else if (Math.abs(deltaXright) === 0) deltaXright = baseSpin;
