@@ -1,6 +1,7 @@
 body {
     margin: 0;
     height: 100vh;
+    font-family: Arial, sans-serif;
 }
 
 canvas {
@@ -9,11 +10,19 @@ canvas {
     display: block;
 }
 
+#loading {
+    position: absolute;
+    top: 40%;
+    color: #3de2ff;
+    font-size: 5rem;
+    width: 100%;
+    text-align: center;
+}
+
 .welcome {
     position: absolute;
-    bottom: 0;
+    bottom: 2%;
     width: 100%;
     color: white;
-    font-size: 5rem;
     text-align: center;
 }
