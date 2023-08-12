@@ -16,6 +16,9 @@ import logos from './assets/logos-all1.png'
 import byu from './assets/byu.jpg'
 import lake from './assets/lake.jpg'
 
+const isPortrait = window.innerWidth < window.innerHeight;
+if (isPortrait) document.body.removeChild(document.getElementById('welcome'))
+
 // SET UP RENDERER
 const renderer = new THREE.WebGLRenderer();
 renderer.shadowMap.enabled = true
@@ -25,8 +28,14 @@ document.body.appendChild(renderer.domElement);
 
 // SET UP CAMERA
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.set(-2, 1.6, 0)
-camera.lookAt(0, .5, 0)
+if (isPortrait) {
+    camera.position.set(-3, 1.6, 0)
+    camera.lookAt(0, 1, 0)
+} else {
+    camera.position.set(-2, 1.6, 0)
+    camera.lookAt(0, .5, 0)
+}
+
 
 // SET UP RESIZE LISTENER
 window.addEventListener('resize', function(){
@@ -57,9 +66,15 @@ const textureLoader = new THREE.TextureLoader(loadingManager)
 
 // CREATE POLYHEDRONS
 const leftPolyhedron = getCustomPentagonalPrism(1, 'l')
-leftPolyhedron.position.set(0, 1, -1.2)
 const rightPolyhedron = getCustomPentagonalPrism(1, 'r')
-rightPolyhedron.position.set(0, 1, 1.2)
+if (isPortrait) {
+    leftPolyhedron.position.set(0, 1.8, 0)
+    rightPolyhedron.position.set(0, .5, 0)
+} else {
+    leftPolyhedron.position.set(0, 1, -1.2)
+    rightPolyhedron.position.set(0, 1, 1.2)
+}
+
 
 // CREATE LOADING BEHAVIOR
 loadingManager.onLoad = function() {
@@ -199,7 +214,7 @@ function isChildOf(x, y) {
     return false
 }
 
-// SHAPES
+// OBJECTS
 function getCustomPentagonalPrism(radius, instance) {
     if (instance !== 'l' && instance !== 'r') return
 

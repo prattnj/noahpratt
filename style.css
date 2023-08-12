@@ -14,12 +14,12 @@ canvas {
     position: absolute;
     top: 40%;
     color: #3de2ff;
-    font-size: 5rem;
+    font-size: 2rem;
     width: 100%;
     text-align: center;
 }
 
-.welcome {
+#welcome {
     position: absolute;
     bottom: 2%;
     width: 100%;
