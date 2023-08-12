@@ -13,6 +13,7 @@ import az from './assets/flags/az.png'
 import ut from './assets/flags/ut.png'
 import wa from './assets/flags/wa.png'
 import logos from './assets/logos-all1.png'
+import byu from './assets/byu.jpg'
 
 // SET UP RENDERER
 const renderer = new THREE.WebGLRenderer();
@@ -189,6 +190,14 @@ function setUpRayCaster(event) {
     return rayCaster.intersectObjects(scene.children)
 }
 
+function isChildOf(x, y) {
+    while (x !== scene) {
+        x = x.parent
+        if (x === y) return true
+    }
+    return false
+}
+
 // SHAPES
 function getCustomPentagonalPrism(radius, instance) {
     if (instance !== 'l' && instance !== 'r') return
@@ -238,9 +247,20 @@ function getLeftSides(sides) {
     fontLoader.load('fonts/noto-sans-regular.json', function (font) {
         // SIDE 0
         sides[0].add(getBillboard('Work Experience', font))
+        sides[0].add(getText('Teaching Assistant / Head TA', font, {yPos: .38, size: .058}))
+        sides[0].add(getText('BYU Computer Science Department', font, {yPos: .3, size: .03}))
+        sides[0].add(getText('Course Material Developer', font, {yPos: .08, size: .058}))
+        sides[0].add(getText('BYU Computer Science Department', font, {yPos: 0, size: .03}))
+        sides[0].add(getText('Founder / Developer', font, {yPos: -.22, size: .058}))
+        sides[0].add(getText('Music Metrics, LLC.', font, {yPos: -.3, size: .03}))
+        sides[0].add(getText('GoatHouse, LLC.', font, {yPos: -.38, size: .03}))
 
         // SIDE 1
         sides[1].add(getBillboard('Education', font))
+        sides[1].add(getText('2020 - 2024', font, {yPos: -.15}))
+        sides[1].add(getText('BS in Computer Science (3.92 GPA)', font, {yPos: -.25}))
+        sides[1].add(getText('Emphasis: Software Engineering', font, {yPos: -.35}))
+        sides[1].add(getText('Minor in Physics', font, {yPos: -.45}))
 
         // SIDE 2
         sides[2].add(getBillboard('Portrait', font))
@@ -273,7 +293,7 @@ function getLeftSides(sides) {
         sides[3].add(strava)
 
         // SIDE 4
-        sides[4].add(getBillboard('Hobbies', font))
+        sides[4].add(getBillboard('About Me', font))
     });
 
     // ADD IMAGES
@@ -281,6 +301,9 @@ function getLeftSides(sides) {
     // SIDE 0
 
     // SIDE 1
+    const byuPic = getPicture(1, .5, .02, byu)
+    byuPic.position.y = .2
+    sides[1].add(byuPic)
 
     // SIDE 2
     sides[2].add(getPicture(.6, .6, .02, me))
@@ -312,31 +335,31 @@ function getRightSides(sides) {
     fontLoader.load('fonts/noto-sans-regular.json', function (font) {
         // SIDE 0
         sides[0].add(getBillboard('50 High Points', font))
-        sides[0].add(getBottomText('Coming soon...', font, {yPos: .0000001}))
+        sides[0].add(getText('Coming soon...', font, {yPos: .0000001}))
 
         // SIDE 1
         sides[1].add(getBillboard('Online Chess', font))
-        sides[1].add(getBottomText('Fully functional chess server', font, {yPos: -.25}))
-        sides[1].add(getBottomText('written in Java. For now, the client', font, {yPos: -.35}))
-        sides[1].add(getBottomText('is available as an executable .jar.', font, {yPos: -.45}))
+        sides[1].add(getText('Fully functional chess server', font, {yPos: -.25}))
+        sides[1].add(getText('written in Java. For now, the client', font, {yPos: -.35}))
+        sides[1].add(getText('is available as an executable .jar.', font, {yPos: -.45}))
 
         // SIDE 2
         sides[2].add(getBillboard('Family Map', font))
-        sides[2].add(getBottomText('Artificial family history data', font, {yPos: -.25}))
-        sides[2].add(getBottomText('generation in both Java and Go.', font, {yPos: -.35}))
-        sides[2].add(getBottomText('Client is a native Android app.', font, {yPos: -.45}))
+        sides[2].add(getText('Artificial family history data', font, {yPos: -.25}))
+        sides[2].add(getText('generation in both Java and Go.', font, {yPos: -.35}))
+        sides[2].add(getText('Client is a native Android app.', font, {yPos: -.45}))
 
         // SIDE 3
         sides[3].add(getBillboard('Music Metrics', font))
-        sides[3].add(getBottomText('Full stack app to see stats about', font, {yPos: -.25}))
-        sides[3].add(getBottomText('your all-time Spotify listening', font, {yPos: -.35}))
-        sides[3].add(getBottomText('history. Written in Go and React.', font, {yPos: -.45}))
+        sides[3].add(getText('Full stack app to see stats about', font, {yPos: -.25}))
+        sides[3].add(getText('your all-time Spotify listening', font, {yPos: -.35}))
+        sides[3].add(getText('history. Written in Go and React.', font, {yPos: -.45}))
 
         // SIDE 4
         sides[4].add(getBillboard('GoatHouse Pizza', font))
-        sides[4].add(getBottomText('Online hub for my pizza company.', font, {yPos: -.25}))
-        sides[4].add(getBottomText('Front end written in Vanilla JS', font, {yPos: -.35}))
-        sides[4].add(getBottomText('and utilizes Microsoft Azure.', font, {yPos: -.45}))
+        sides[4].add(getText('Online hub for my pizza company.', font, {yPos: -.25}))
+        sides[4].add(getText('Front end written in Vanilla JS', font, {yPos: -.35}))
+        sides[4].add(getText('and utilizes Microsoft Azure.', font, {yPos: -.45}))
     });
 
     // ADD IMAGES
@@ -356,15 +379,15 @@ function getRightSides(sides) {
     sides[4].add(getProjectPicture(ghp, "https://goathousepizza.com"))
 }
 
-function getBottomText(text, font, options) {
+function getText(text, font, options) {
     if (options === undefined) options = {}
     const geometry = new TextGeometry(text, {
         font: font,
         size: options.size || .05,
         height: options.thickness || .005,
     });
-    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
-    words.position.set(centerTextX(geometry), (options.yPos || -.42), 0)
+    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x333333, side: THREE.DoubleSide}))
+    words.position.set(centerTextX(geometry), (options.yPos || 0), 0)
     return words
 }
 
@@ -470,7 +493,7 @@ function getSocialMedia(text, url, font) {
     const boxMat2 = new THREE.MeshStandardMaterial({color: 0xffffff})
     const box = new THREE.Mesh(boxGeo, boxMat1)
 
-    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
+    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x333333, side: THREE.DoubleSide}))
     words.position.set(textWidth / -2, FONT_SIZE / -2, 0)
 
     box.add(words)
@@ -488,12 +511,4 @@ function polarToCartesian(radius, theta) {
     const x = radius * Math.cos(theta);
     const y = radius * Math.sin(theta);
     return [x, y];
-}
-
-function isChildOf(x, y) {
-    while (x !== scene) {
-        x = x.parent
-        if (x === y) return true
-    }
-    return false
 }
