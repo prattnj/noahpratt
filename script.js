@@ -1,12 +1,18 @@
 import * as THREE from 'three'
-import {TextGeometry} from "three/examples/jsm/geometries/TextGeometry";
-import {BoxGeometry} from "three";
-import {FontLoader} from "three/addons/loaders/FontLoader.js";
-import chess from "./assets/chess.png";
-import fms from "./assets/fms.png";
-import mm from "./assets/mm.png";
-import ghp from "./assets/ghp.png";
-import wood from "./assets/wood.png";
+import {TextGeometry} from 'three/examples/jsm/geometries/TextGeometry';
+import {FontLoader} from 'three/addons/loaders/FontLoader.js';
+
+import chess from './assets/chess.png';
+import fms from './assets/fms.png';
+import mm from './assets/mm.png';
+import ghp from './assets/ghp.png';
+import wood from './assets/wood.png';
+import me from './assets/me2.png'
+import usa from './assets/flags/usa.png'
+import az from './assets/flags/az.png'
+import ut from './assets/flags/ut.png'
+import wa from './assets/flags/wa.png'
+import logos from './assets/logos-all1.png'
 
 // SET UP RENDERER
 const renderer = new THREE.WebGLRenderer();
@@ -44,7 +50,7 @@ const clickables = []
 
 // SET UP LOADERS
 const loadingManager = new THREE.LoadingManager()
-const fontLoader = new FontLoader()
+const fontLoader = new FontLoader(loadingManager)
 const textureLoader = new THREE.TextureLoader(loadingManager)
 
 // CREATE POLYHEDRONS
@@ -142,14 +148,9 @@ function onMouseDown(event) {
             window.open(clickables[index][3])
             lastClickable.material = clickables[index][1]
         }
-        if (clicked.geometry instanceof TextGeometry) {
-            if (clicked.parent.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent.parent
-            else clickedObject = clicked.parent.parent
-        } else if (clicked.geometry instanceof BoxGeometry) {
-            if (clicked.parent.geometry instanceof BoxGeometry) clickedObject = clicked.parent.parent.parent
-            else clickedObject = clicked.parent.parent
-        }
-        else clickedObject = clicked.parent
+        if (isChildOf(clicked, leftPolyhedron)) clickedObject = leftPolyhedron;
+        else if (isChildOf(clicked, rightPolyhedron)) clickedObject = rightPolyhedron;
+        else clickedObject = null;
     }
 }
 
@@ -159,6 +160,7 @@ function onMouseUp(event) {
     clickedObject = null
 }
 
+// HELPERS
 function rotateObject(object, deltaX) {
     if (object === null) return
     object.rotation.y += deltaX / 200
@@ -250,6 +252,33 @@ function getLeftSides(sides) {
     });
 
     // ADD IMAGES
+
+    // SIDE 0
+
+    // SIDE 1
+
+    // SIDE 2
+    sides[2].add(getPicture(.6, .6, .02, me))
+    const usaFlag = getPicture(.3, .2, .01, usa)
+    const azFlag = getPicture(.3, .2, .01, az)
+    const utFlag = getPicture(.3, .2, .01, ut)
+    const waFlag = getPicture(.3, .2, .01, wa)
+    usaFlag.position.set(-.35, .3, 0)
+    azFlag.position.set(.35, .3, 0)
+    utFlag.position.set(-.35, -.3, 0)
+    waFlag.position.set(.35, -.3, 0)
+    usaFlag.rotateZ(.3)
+    azFlag.rotateZ(-.3)
+    utFlag.rotateZ(-.3)
+    waFlag.rotateZ(.3)
+    sides[2].add(usaFlag, azFlag, utFlag, waFlag)
+
+    // SIDE 3
+    const logoPic = getPicture(1, .2, .03, logos)
+    logoPic.position.y = .35
+    sides[3].add(logoPic)
+
+    // SIDE 4
 }
 
 function getRightSides(sides) {
@@ -338,6 +367,19 @@ function getProjectPicture(res, url) {
     return mesh
 }
 
+function getPicture(x, y, z, res) {
+    const geometry = new THREE.BoxGeometry(x, y, z)
+    const materials = [
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa}),
+        new THREE.MeshBasicMaterial({color: 0xffffff, map: textureLoader.load(res)}),
+        new THREE.MeshBasicMaterial({color: 0xaaaaaa})
+    ]
+    return new THREE.Mesh(geometry, materials)
+}
+
 function getBillboard(text, font) {
 
     const FONT_SIZE = .08
@@ -394,4 +436,12 @@ function polarToCartesian(radius, theta) {
     const x = radius * Math.cos(theta);
     const y = radius * Math.sin(theta);
     return [x, y];
+}
+
+function isChildOf(x, y) {
+    while (x !== scene) {
+        x = x.parent
+        if (x === y) return true
+    }
+    return false
 }
