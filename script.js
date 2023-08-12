@@ -14,6 +14,7 @@ import ut from './assets/flags/ut.png'
 import wa from './assets/flags/wa.png'
 import logos from './assets/logos-all1.png'
 import byu from './assets/byu.jpg'
+import lake from './assets/lake.jpg'
 
 // SET UP RENDERER
 const renderer = new THREE.WebGLRenderer();
@@ -248,12 +249,12 @@ function getLeftSides(sides) {
         // SIDE 0
         sides[0].add(getBillboard('Work Experience', font))
         sides[0].add(getText('Teaching Assistant / Head TA', font, {yPos: .38, size: .058}))
-        sides[0].add(getText('BYU Computer Science Department', font, {yPos: .3, size: .03}))
+        sides[0].add(getText('BYU Computer Science Department', font, {yPos: .3, size: .037}))
         sides[0].add(getText('Course Material Developer', font, {yPos: .08, size: .058}))
-        sides[0].add(getText('BYU Computer Science Department', font, {yPos: 0, size: .03}))
+        sides[0].add(getText('BYU Computer Science Department', font, {yPos: 0, size: .037}))
         sides[0].add(getText('Founder / Developer', font, {yPos: -.22, size: .058}))
-        sides[0].add(getText('Music Metrics, LLC.', font, {yPos: -.3, size: .03}))
-        sides[0].add(getText('GoatHouse, LLC.', font, {yPos: -.38, size: .03}))
+        sides[0].add(getText('Music Metrics, LLC.', font, {yPos: -.3, size: .037}))
+        sides[0].add(getText('GoatHouse, LLC.', font, {yPos: -.38, size: .037}))
 
         // SIDE 1
         sides[1].add(getBillboard('Education', font))
@@ -276,7 +277,7 @@ function getLeftSides(sides) {
         github.position.set(.3, .1, 0)
         sides[3].add(github)
 
-        const gmail = getSocialMedia('Gmail', 'https://musicmetrics.app', font)
+        const gmail = getSocialMedia('Gmail', 'https://dev.musicmetrics.app/contact', font)
         gmail.position.set(-.35, -.125, 0)
         sides[3].add(gmail)
 
@@ -294,6 +295,12 @@ function getLeftSides(sides) {
 
         // SIDE 4
         sides[4].add(getBillboard('About Me', font))
+        sides[4].add(getText('Born and raised in the Valley of the Sun,', font, {yPos: .43, size: .04}))
+        sides[4].add(getText('I\'m a full stack software developer who', font, {yPos: .35, size: .04}))
+        sides[4].add(getText('thrives on efficient solutions and clean', font, {yPos: .27, size: .04}))
+        sides[4].add(getText('code. Away from the screen, I channel the', font, {yPos: .19, size: .04}))
+        sides[4].add(getText('same determination into conquering the', font, {yPos: .11, size: .04}))
+        sides[4].add(getText('great outdoors of the American West.', font, {yPos: .03, size: .04}))
     });
 
     // ADD IMAGES
@@ -327,6 +334,9 @@ function getLeftSides(sides) {
     sides[3].add(logoPic)
 
     // SIDE 4
+    const lakePic = getPicture(1, .48, .01, lake)
+    lakePic.position.y = -.24
+    sides[4].add(lakePic)
 }
 
 function getRightSides(sides) {
