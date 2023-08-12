@@ -103,37 +103,40 @@ renderer.setAnimationLoop(() => {
 // SET UP MOUSE EVENTS AND ROTATION
 function addMouseHandler(canvas) {
     canvas.addEventListener('mousemove', function(e) {
-        onMouseMove(e)
+        e.preventDefault()
+        onMouseMove(e, true)
     }, false)
     canvas.addEventListener('mousedown', function(e) {
-        onMouseDown(e)
+        e.preventDefault();
+        onMouseDown(e, true)
     }, false)
     canvas.addEventListener('mouseup', function(e) {
         onMouseUp(e)
     }, false)
     canvas.addEventListener('mouseout', function(e) {
-        onMouseUp(e)
+        e.preventDefault();
+        onMouseUp()
     }, false)
     canvas.addEventListener('touchstart', function(e) {
-        onMouseDown(e)
+        onMouseDown(e, false)
     }, false)
     canvas.addEventListener('touchmove', function(e) {
-        onMouseMove(e)
+        onMouseMove(e, false)
     }, false)
-
+    canvas.addEventListener('touchend', function() {
+        onMouseUp()
+    })
 }
 
-function onMouseMove(event) {
-    event.preventDefault()
-
+function onMouseMove(event, isMouse) {
     // Rotation logic
     if (mouseDown) {
-        let deltaX = event.clientX - mouseX
+        let deltaX = isMouse ? event.clientX - mouseX : event.touches[0].clientX - mouseX
         if (clickedObject === leftPolyhedron) deltaXleft = deltaX;
         else if (clickedObject === rightPolyhedron) deltaXright = deltaX;
 
         rotateObject(clickedObject, deltaX)
-        mouseX = event.clientX
+        mouseX = isMouse ? event.clientX : event.touches[0].clientX
         return
     }
 
@@ -154,12 +157,11 @@ function onMouseMove(event) {
     }
 }
 
-function onMouseDown(event) {
-    event.preventDefault();
+function onMouseDown(event, isMouse) {
     mouseDown = true;
-    mouseX = event.clientX;
+    mouseX = isMouse ? event.clientX : event.touches[0].clientX
 
-    const intersects = setUpRayCaster(event)
+    const intersects = setUpRayCaster(isMouse ? event : event.touches[0])
     if (intersects.length > 0) {
         const clicked = intersects[0].object
         const index = clickablesContains(clicked)
@@ -173,8 +175,7 @@ function onMouseDown(event) {
     }
 }
 
-function onMouseUp(event) {
-    event.preventDefault();
+function onMouseUp() {
     mouseDown = false;
     clickedObject = null
 }
