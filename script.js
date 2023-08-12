@@ -114,6 +114,13 @@ function addMouseHandler(canvas) {
     canvas.addEventListener('mouseout', function(e) {
         onMouseUp(e)
     }, false)
+    canvas.addEventListener('touchstart', function(e) {
+        onMouseDown(e)
+    }, false)
+    canvas.addEventListener('touchmove', function(e) {
+        onMouseMove(e)
+    }, false)
+
 }
 
 function onMouseMove(event) {
