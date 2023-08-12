@@ -113,25 +113,20 @@ function onMouseMove(event) {
         return
     }
 
+    // Deselect everything
+    document.body.style.cursor = "auto"
+    resetClickables()
+
     // Cursor logic
     const intersects = setUpRayCaster(event)
     if (intersects.length > 0) {
         const clicked = intersects[0].object
         const index = clickablesContains(clicked)
         if (index >= 0) {
-            clicked.material = clickables[index][2]
-            lastClickable = clicked
+            clickables[index][0].material = clickables[index][2]
+            lastClickable = clickables[index][0]
             document.body.style.cursor = "pointer"
-        } else {
-            if (lastClickable !== null) lastClickable.material = clickables[clickablesContains(lastClickable)][1]
-            document.body.style.cursor = "auto"
         }
-    } else {
-        // deselect all picture frames
-        document.body.style.cursor = "auto"
-        clickables.forEach(item => {
-            item[0].material = item[1]
-        })
     }
 }
 
@@ -174,8 +169,14 @@ function updateDeltas() {
     else if (Math.abs(deltaXright) === 0) deltaXright = baseSpin;
 }
 
+function resetClickables() {
+    clickables.forEach(item => {
+        item[0].material = item[1]
+    })
+}
+
 function clickablesContains(object) {
-    for (let i = 0; i < clickables.length; i++) if (clickables[i][0] === object) return i;
+    for (let i = 0; i < clickables.length; i++) if (clickables[i][0] === object || isChildOf(object, clickables[i][0])) return i
     return -1
 }
 
@@ -242,10 +243,34 @@ function getLeftSides(sides) {
         sides[1].add(getBillboard('Education', font))
 
         // SIDE 2
-        sides[2].add(getBillboard('Pic of me', font))
+        sides[2].add(getBillboard('Portrait', font))
 
         // SIDE 3
         sides[3].add(getBillboard('Socials', font))
+
+        const linkedin = getSocialMedia('LinkedIn', 'https://linkedin.com/in/noahjpratt', font)
+        linkedin.position.set(-.25, .1, 0)
+        sides[3].add(linkedin)
+
+        const github = getSocialMedia('GitHub', 'https://github.com/prattnj', font)
+        github.position.set(.3, .1, 0)
+        sides[3].add(github)
+
+        const gmail = getSocialMedia('Gmail', 'https://musicmetrics.app', font)
+        gmail.position.set(-.35, -.125, 0)
+        sides[3].add(gmail)
+
+        const instagram = getSocialMedia('Instagram', 'https://instagram.com/_noahpratt00', font)
+        instagram.position.set(.225, -.125, 0)
+        sides[3].add(instagram)
+
+        const facebook = getSocialMedia('Facebook', 'https://facebook.com/noah.pratt.18400/', font)
+        facebook.position.set(-.25, -.35, 0)
+        sides[3].add(facebook)
+
+        const strava = getSocialMedia('Strava', 'https://strava.com/athletes/121620992', font)
+        strava.position.set(.32, -.35, 0)
+        sides[3].add(strava)
 
         // SIDE 4
         sides[4].add(getBillboard('Hobbies', font))
@@ -274,7 +299,7 @@ function getLeftSides(sides) {
     sides[2].add(usaFlag, azFlag, utFlag, waFlag)
 
     // SIDE 3
-    const logoPic = getPicture(1, .2, .03, logos)
+    const logoPic = getPicture(1.1, .2, .03, logos)
     logoPic.position.y = .35
     sides[3].add(logoPic)
 
@@ -424,6 +449,33 @@ function getBillboard(text, font) {
     board.position.set(0, .61, -.05)
 
     return board
+}
+
+function getSocialMedia(text, url, font) {
+
+    const FONT_SIZE = .08
+    const HORIZ_PADDING = .1
+    const VERT_PADDING = .1
+    const HEIGHT = FONT_SIZE + VERT_PADDING;
+
+    const geometry = new TextGeometry(text, {
+        font: font,
+        size: FONT_SIZE,
+        height: .01,
+    })
+    const textWidth = centerTextX(geometry) * -2
+
+    const boxGeo = new THREE.BoxGeometry(textWidth + HORIZ_PADDING, HEIGHT, .01)
+    const boxMat1 = new THREE.MeshStandardMaterial({color: 0xdddddd})
+    const boxMat2 = new THREE.MeshStandardMaterial({color: 0xffffff})
+    const box = new THREE.Mesh(boxGeo, boxMat1)
+
+    const words = new THREE.Mesh(geometry, new THREE.MeshStandardMaterial({color: 0x0000ff, side: THREE.DoubleSide}))
+    words.position.set(textWidth / -2, FONT_SIZE / -2, 0)
+
+    box.add(words)
+    clickables.push([box, boxMat1, boxMat2, url])
+    return box
 }
 
 function centerTextX(geometry) {
