@@ -538,7 +538,7 @@ async function populateBetaSides(sides) {
     sides[4].add(await getText('An Android app, supported by a Java', {yPos: .42, size: .039}));
     sides[4].add(await getText('backend, that lets users create and explore', {yPos: .35, size: .039}));
     sides[4].add(await getText('artificial family history generation.', {yPos: .28, size: .039}));
-    sides[4].add(await getTextButton('Click here to visit repo', () => window.open(), {fontSize: .02, yPos: .23, paddingX: .1, paddingY: .02}));
+    sides[4].add(await getTextButton('Repo private. But I like the button', () => {}, {fontSize: .02, yPos: .23, paddingX: .1, paddingY: .02}));
     sides[4].add(getHorizontalLine(1, {yPos: .18}));
     sides[4].add(await getText('A chess server that allows multiple', {yPos: .11, size: .039}));
     sides[4].add(await getText('players, spectators, and games. WebSocket', {yPos: .04, size: .039}));
