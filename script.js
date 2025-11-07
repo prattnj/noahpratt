@@ -89,10 +89,10 @@ const polyhedronBeta = await getCustomXagonalPrism(1.2, 6, (sides) => populateBe
 const polyhedronGamma = await getCustomXagonalPrism(1.2, 5, (sides) => populateGammaSides(sides));
 const polyhedronDelta = await getCustomXagonalPrism(1.2, 5, (sides) => populateDeltaSides(sides));
 if (isPortrait) {
-    polyhedronAlpha.position.set(0, 1.8, 0);
-    polyhedronBeta.position.set(0, .5, 0);
-    polyhedronGamma.position.set(0, -.8, 0);
-    polyhedronDelta.position.set(0, -2.1, 0);
+    polyhedronAlpha.position.set(0, 1, 0);
+    polyhedronBeta.position.set(0, 1, gap);
+    polyhedronGamma.position.set(0, 1, 2 * gap);
+    polyhedronDelta.position.set(0, 1, -gap);
 } else {
     polyhedronAlpha.position.set(0, 1, 0);
     polyhedronBeta.position.set(0, 1, gap);
@@ -109,7 +109,12 @@ const nextText = await getArrowText('Next:', 1.1, 1.1, {color: 0xdddddd, size: .
 const leftNavText = await getArrowText(deltaLabel, 1, -1.1, {color: 0xdddddd, size: .03, height: .002});
 const rightNavText = await getArrowText(betaLabel, 1, 1.1, {color: 0xdddddd, size: .03, height: .002});
 if (isPortrait) {
-
+    rightArrow.position.set(-1.1, 2.2, 0);
+    leftArrow.position.set(-1.1, .2, 0);
+    nextText.position.set(-1.1, 2.1, 0);
+    prevText.position.set(-1.1, .1, 0);
+    rightNavText.position.set(-1.1, 2, 0);
+    leftNavText.position.set(-1.1, 0, 0);
 } else {
     leftArrow.position.set(-1.1, 1.2, -1.1);
     rightArrow.position.set(-1.1, 1.2, 1.1);
@@ -307,6 +312,7 @@ function onMouseMove(event, isMouse) {
         const clicked = intersects[0].object;
         const index = clickablesContains(clicked);
         if (index >= 0) {
+            if (!isMouse) return;
             clickables[index][0].material = clickables[index][2];
             document.body.style.cursor = "pointer";
         }
@@ -334,7 +340,7 @@ function onMouseDown(event, isMouse) {
 
 function onMouseUp() {
     mouseDown = false;
-    clickedObject = null
+    clickedObject = null;
 }
 
 // HELPERS
@@ -574,22 +580,22 @@ async function populateGammaSides(sides) {
     const logoPic = getPicture(1.1, .2, .03, logos);
     logoPic.position.y = .35;
     sides[0].add(logoPic);
-    const linkedin = await getTextButton('LinkedIn', 'https://linkedin.com/in/noahjpratt');
+    const linkedin = await getTextButton('LinkedIn', () => window.open('https://linkedin.com/in/noahjpratt'));
     linkedin.position.set(-.25, .1, 0);
     sides[0].add(linkedin);
-    const github = await getTextButton('GitHub', 'https://github.com/prattnj');
+    const github = await getTextButton('GitHub', () => window.open('https://github.com/prattnj'));
     github.position.set(.3, .1, 0);
     sides[0].add(github);
-    const gmail = await getTextButton('Gmail', 'mailto:prattnj@gmail.com');
+    const gmail = await getTextButton('Gmail', () => window.open('mailto:prattnj@gmail.com'));
     gmail.position.set(-.35, -.125, 0);
     sides[0].add(gmail);
-    const instagram = await getTextButton('Instagram', 'https://instagram.com/_noahpratt00');
+    const instagram = await getTextButton('Instagram', () => window.open('https://instagram.com/_noahpratt00'));
     instagram.position.set(.225, -.125, 0);
     sides[0].add(instagram);
-    const facebook = await getTextButton('Facebook', 'https://facebook.com/noah.pratt.18400/');
+    const facebook = await getTextButton('Facebook', () => window.open('https://facebook.com/noah.pratt.18400/'));
     facebook.position.set(-.25, -.35, 0);
     sides[0].add(facebook);
-    const strava = await getTextButton('Strava', 'https://strava.com/athletes/121620992');
+    const strava = await getTextButton('Strava', () => window.open('https://strava.com/athletes/121620992'));
     strava.position.set(.32, -.35, 0);
     sides[0].add(strava);
 
