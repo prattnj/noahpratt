@@ -278,12 +278,15 @@ function addMouseHandler(canvas) {
         onMouseUp();
     }, false);
     canvas.addEventListener('touchstart', function(e) {
+        e.preventDefault();
         onMouseDown(e, false);
-    }, false);
+    }, { passive: false });
     canvas.addEventListener('touchmove', function(e) {
+        e.preventDefault();
         onMouseMove(e, false);
-    }, false);
-    canvas.addEventListener('touchend', function() {
+    }, { passive: false });
+    canvas.addEventListener('touchend', function(e) {
+        e.preventDefault();
         onMouseUp();
     });
 }
